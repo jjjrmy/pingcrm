@@ -36,6 +36,8 @@ class OrganizationsController extends Controller
 
     public function store()
     {
+        abort(500);
+        
         Auth::user()->account->organizations()->create(
             Request::validate([
                 'name' => ['required', 'max:100'],

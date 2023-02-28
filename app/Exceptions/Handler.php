@@ -38,4 +38,35 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    protected $messages = [
+        500 => 'Something went wrong',
+        503 => 'Service unavailable',
+        404 => 'Not found',
+        403 => 'Not authorized',
+    ];
+
+    public function render($request, Throwable $e)
+    {
+        $response = parent::render($request, $e);
+    
+        $status = $response->getStatusCode();
+    
+        if (! array_key_exists($status, $this->messages)) {
+            return $response;
+        }
+    
+        if (! $request->isMethod('GET')) { 
+            return back()
+                ->setStatusCode($status)
+                ->with('error', $this->messages[$status]);
+        } 
+    
+        return inertia('error/page', [
+            'status' => $status,
+            'message' => $this->messages[$status],
+        ])
+            ->toResponse($request)
+            ->setStatusCode($status);
+    }
 }
